@@ -27,7 +27,7 @@ extension Binding where Value: OptionalProtocol {
      * ```
      */
     @MainActor
-    var shouldPresent: Binding<Bool> {
+    public var shouldPresent: Binding<Bool> {
         Binding<Bool>(
             get: {
                 self.wrappedValue.wrapped != nil

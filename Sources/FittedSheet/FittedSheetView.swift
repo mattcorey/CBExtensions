@@ -66,7 +66,7 @@ struct FittedSheetModifier<SheetContents: View>: ViewModifier {
     }
 }
 extension View {
-    func fittedSheet<Content>(isPresented: Binding<Bool>, @ViewBuilder contents: @escaping () -> Content) -> some View where Content: View {
+    public func fittedSheet<Content>(isPresented: Binding<Bool>, @ViewBuilder contents: @escaping () -> Content) -> some View where Content: View {
         self.modifier(FittedSheetModifier(isPresented: isPresented, sheetContents: contents))
     }
 }
