@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import DateExtensions
+@testable import CommonExtensions
 
 @Test func testPlus() async throws {
     let anchorDate = dateFor(year: 2025, month: 1, day: 1)
