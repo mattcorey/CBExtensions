@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+struct Sizerer: Equatable {
+    var width: CGFloat?
+    var height: CGFloat?
+}
+
 public struct SizeReader: ViewModifier {
     var width: Binding<CGFloat?>?
     var height: Binding<CGFloat?>?
@@ -30,8 +35,8 @@ public struct SizeReader: ViewModifier {
         } else {
             content
                 .frame(width: lock ? width?.wrappedValue : nil, height: lock ? height?.wrappedValue : nil)
-                .onGeometryChange(for: CGSize.self) { proxy in
-                    proxy.size
+                .onGeometryChange(for: Sizerer.self) { proxy in
+                    Sizerer(width: proxy.size.width, height: proxy.size.height)
                 } action: { newValue in
                     width?.wrappedValue = newValue.width
                     height?.wrappedValue = newValue.height
