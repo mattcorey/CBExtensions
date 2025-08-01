@@ -12,14 +12,16 @@ import SwiftUIExtensions
  * The FittedSheet is a hybrid Popover/Sheet component that renders itself as a short
  * Sheet (fitted) on iPhones, and Popover on larger devices.
  *
- * When rendered as a Sheet, it will include a standard 'Close' button, which will take on the
- * `.tint` modifier.
+ * When rendered as a Sheet, it will include a standard 'Close' button by default, which will take on the
+ * `.tint` modifier. The close button can be hidden by setting `showCloseButton` to false.
  */
 
 struct FittedSheetView<Contents: View>: View {
     @Environment(\.isPhone) var isPhone
 
     @Binding var presented: Bool
+    
+    var showCloseButton: Bool = true
 
     @State var contentHeight: CGFloat?
 
@@ -27,7 +29,7 @@ struct FittedSheetView<Contents: View>: View {
 
     var body: some View {
         VStack {
-            if isPhone {
+            if isPhone && showCloseButton {
                 Button {
                     presented = false
                 } label: {
@@ -54,20 +56,22 @@ struct FittedSheetView<Contents: View>: View {
 
 struct FittedSheetModifier<SheetContents: View>: ViewModifier {
     @Binding var isPresented: Bool
+    
+    var showCloseButton: Bool = true
 
     @ViewBuilder var sheetContents: SheetContents
 
     func body(content: Content) -> some View {
         content.popover(isPresented: $isPresented) {
-            FittedSheetView(presented: $isPresented) {
+            FittedSheetView(presented: $isPresented, showCloseButton: showCloseButton) {
                 sheetContents
             }
         }
     }
 }
 extension View {
-    public func fittedSheet<Content>(isPresented: Binding<Bool>, @ViewBuilder contents: @escaping () -> Content) -> some View where Content: View {
-        self.modifier(FittedSheetModifier(isPresented: isPresented, sheetContents: contents))
+    public func fittedSheet<Content>(isPresented: Binding<Bool>, showCloseButton: Bool = true, @ViewBuilder contents: @escaping () -> Content) -> some View where Content: View {
+        self.modifier(FittedSheetModifier(isPresented: isPresented, showCloseButton: showCloseButton, sheetContents: contents))
     }
 }
 
@@ -92,5 +96,74 @@ extension View {
             Text("This setting may be overriden by a similar Account setting.")
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+}
+
+@available(iOS 17.0, *)
+#Preview("No Close Button") {
+    @Previewable @State var showIt = true
+
+    Button {
+        showIt.toggle()
+    } label: {
+        Text("Show without close button")
+    }
+    .fittedSheet(isPresented: $showIt, showCloseButton: false) {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Custom Dismissal")
+                .font(.headline)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text("This sheet doesn't show a close button. Users must dismiss it using the provided action or by tapping outside on iPad.")
+                .fixedSize(horizontal: false, vertical: true)
+            
+            Button {
+                showIt = false
+            } label: {
+                Text("Dismiss")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+        }
+    }
+}
+
+@available(iOS 26.0, *)
+#Preview("Memory Style") {
+    @Previewable @State var showIt = true
+
+    Button {
+        showIt.toggle()
+    } label: {
+        Text("Show without close button")
+    }
+    .fittedSheet(isPresented: $showIt, showCloseButton: false) {
+        VStack(alignment: .leading, spacing: 16) {
+            ZStack(alignment: .leading) {
+                Button {
+                    showIt = false
+                } label: {
+                    Label("Close", systemImage: "xmark")
+                        .labelStyle(.iconOnly)
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+                .glassEffect(in: .circle)
+                
+                Label("New Memories", systemImage: "brain")
+                    .font(.headline.bold())
+                    .foregroundStyle(.purple)
+                    .frame(maxWidth: .infinity)
+            }
+            
+            Text("This sheet doesn't show a close button. Users must dismiss it using the provided action or by tapping outside on iPad.")
+
+            Text("This sheet doesn't show a close button. Users must dismiss it using the provided action or by tapping outside on iPad.")
+
+            Text("This sheet doesn't show a close button. Users must dismiss it using the provided action or by tapping outside on iPad.")
+
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.top)
     }
 }
